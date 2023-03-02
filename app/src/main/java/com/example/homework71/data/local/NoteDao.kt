@@ -7,15 +7,15 @@ import com.example.homework71.data.model.NoteEntity
 interface NoteDao {
 
     @Insert
-    fun createNote(noteEntity: NoteEntity)
+    suspend fun createNote(noteEntity: NoteEntity)
 
     @Update
-    fun editNote(noteEntity: NoteEntity)
+    suspend fun editNote(noteEntity: NoteEntity)
 
     @Delete
-    fun deleteNote(noteEntity: NoteEntity)
+    suspend fun deleteNote(noteEntity: NoteEntity)
 
     @Query("SELECT * FROM notes")
-    fun getNotes():List<NoteEntity>
+    suspend fun getNotes():List<NoteEntity>
 
 }
