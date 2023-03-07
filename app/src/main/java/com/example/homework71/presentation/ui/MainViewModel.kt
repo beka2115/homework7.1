@@ -23,7 +23,7 @@ class MainViewModel @Inject constructor(
     private val _getNotesState = MutableStateFlow<UIState<List<Note>>>(UIState.Empty())
     val getNotesState = _getNotesState.asStateFlow()
 
-    private val _createNoteState = MutableStateFlow<UIState<List<Note>>>(UIState.Empty())
+    private val _createNoteState = MutableStateFlow<UIState<Unit>>(UIState.Empty())
 
     fun getNotes() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -63,7 +63,7 @@ class MainViewModel @Inject constructor(
                         }
                         is Resource.Success -> {
                             if (res.data != null) {
-                                UIState.Success(res.data)
+                               _createNoteState.value =  UIState.Success(res.data)
                             }
                         }
                     }
