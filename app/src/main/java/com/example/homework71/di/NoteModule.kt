@@ -7,7 +7,6 @@ import com.example.homework71.data.local.NoteDao
 import com.example.homework71.data.local.NoteDatabase
 import com.example.homework71.data.repository.NoteRepositoryImpl
 import com.example.homework71.domain.repository.NoteRepository
-import com.example.homework71.presentation.MainActivity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,12 +23,11 @@ object NoteModule {
     @Provides
     fun provideNoteDatabase(
         @ApplicationContext context: Context
-    ) = Room.databaseBuilder(
+    ): NoteDatabase = Room.databaseBuilder(
         context,
         NoteDatabase::class.java,
         "note_db"
         ).allowMainThreadQueries().build()
-
 
     @Singleton
     @Provides
