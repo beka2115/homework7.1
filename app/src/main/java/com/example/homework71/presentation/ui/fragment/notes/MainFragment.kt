@@ -1,48 +1,41 @@
 package com.example.homework71.presentation.ui.fragment.notes
 
+import android.app.AlertDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.homework71.R
 import com.example.homework71.databinding.FragmentMainBinding
+import com.example.homework71.domain.model.Note
+import com.example.homework71.presentation.base.BaseFragment
 import com.example.homework71.presentation.ui.MainViewModel
 import com.example.homework71.presentation.utils.UIState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainFragment : Fragment() {
+class MainFragment : BaseFragment(R.layout.fragment_main) {
 
-    private lateinit var binding: FragmentMainBinding
+    private val binding by viewBinding(FragmentMainBinding::bind)
     private val viewModel: MainViewModel by viewModels()
-    private val adapter = NoteAdapter()
+    private lateinit var builder: AlertDialog.Builder
+    private lateinit var adapter: NoteAdapter
+    private var notePosition: Int? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentMainBinding.inflate(inflater, container, false)
-        return binding.root
+    companion object {
+        const val KEY_FOR_UPDATE_NOTE = "keyUpdate"
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initView()
-        setUpRequests()
-        setUpSubscribers()
-        initListener()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        adapter = NoteAdapter(this::onLongNoteClick, this::onNoteClick)
+        builder = AlertDialog.Builder(requireContext())
     }
 
-    private fun initListener() {
+    override fun initClickListeners() {
         with(binding) {
             btnEdit.setOnClickListener {
                 findNavController().navigate(R.id.createNoteFragment)
@@ -50,38 +43,56 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun initView() {
+    override fun initialize() {
+        builder = AlertDialog.Builder(requireContext())
         with(binding) {
             recyclerNotes.layoutManager = LinearLayoutManager(context)
             recyclerNotes.adapter = adapter
         }
     }
 
-    private fun setUpSubscribers() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getNotesState.collect { state ->
-                    when (state) {
-                        is UIState.Empty -> {}
-                        is UIState.Error -> {
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                        is UIState.Loading -> {
-                            // TODO show progress bar
-                        }
-                        is UIState.Success -> {
-                            adapter.addAllNotes(state.data)
-                        }
-                    }
-
+    override fun setupSubscribers() {
+        viewModel.deleteNoteState.collectUIState(
+            state = { state ->
+                binding.progress.isVisible = state is UIState.Loading
+            },
+            onSuccess = {
+                if (notePosition != null) {
+                    adapter.deleteNote(adapter.sendNote(notePosition!!))
                 }
             }
-        }
+        )
+        viewModel.getNotesState.collectUIState(
+            state = { state ->
+                binding.progress.isVisible = state is UIState.Loading
+            },
+            onSuccess = { data ->
+                adapter.addAllNotes(data)
+            }
+        )
+
     }
 
-    private fun setUpRequests() {
+    private fun onLongNoteClick(position: Int) {
+        builder.setTitle("Delete").setMessage("Do you want to delete?")
+            .setCancelable(true)
+            .setPositiveButton("Yes") { dialogInterface, _ ->
+                viewModel.deleteNote(adapter.sendNote(position))
+                notePosition = position
+                dialogInterface.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialogInterface, _ ->
+                dialogInterface.cancel()
+                notePosition = null
+            }
+            .show()
+    }
+
+    private fun onNoteClick(note: Note) {
+        findNavController().navigate(R.id.createNoteFragment, bundleOf(KEY_FOR_UPDATE_NOTE to note))
+    }
+
+    override fun setupRequests() {
         viewModel.getNotes()
     }
-
 }

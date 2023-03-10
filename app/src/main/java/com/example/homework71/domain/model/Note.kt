@@ -2,8 +2,8 @@ package com.example.homework71.domain.model
 
 class Note (
     val id: Int = DEFAULT_ID,
-    val title: String,
-    val description: String
+    var title: String,
+    var description: String
         ): java.io.Serializable
 {
     companion object{

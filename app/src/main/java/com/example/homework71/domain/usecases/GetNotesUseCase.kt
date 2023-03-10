@@ -7,6 +7,6 @@ class GetNotesUseCase @Inject constructor(
     private val noteRepository: NoteRepository
 ) {
 
-    fun getNotes() = noteRepository.getNotes()
+    operator fun invoke() = noteRepository.getNotes()
 
 }
