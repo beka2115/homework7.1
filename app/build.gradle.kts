@@ -67,12 +67,12 @@ dependencies {
 
     //nav_graph
 
-    implementation (Daps.NavigationComponent.fragment)
+    implementation (Deps.NavigationComponent.fragment)
     implementation(Deps.NavigationComponent.ui)
     //circleImage
     implementation(Deps.Coroutines.android)
 
     //viewBinding
-    implementation(Deps.ViewBinding.Delegate.viewBindingDelegate)
+    implementation(Deps.ViewBindingDelegate.viewBindingDelegate)
 
 }
