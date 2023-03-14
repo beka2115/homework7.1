@@ -35,6 +35,7 @@ class MainViewModel @Inject constructor(
     fun editNote(note:Note){
         updateNoteUseCase(note).collectFlow(_updateNoteState)
     }
+
     fun getNotes() {
     getNotesUseCase().collectFlow(_getNotesState)
     }
@@ -46,6 +47,5 @@ class MainViewModel @Inject constructor(
     fun deleteNote(note: Note) {
         deleteNoteUseCase(note).collectFlow(_deleteNoteState)
     }
-
 }
 
