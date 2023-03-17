@@ -14,3 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "homework7.1"
 include(":app")
+include(":data")
+include(":domain")
+include(":datamain")

@@ -3,9 +3,9 @@ package com.example.homework71.di
 import android.content.Context
 import androidx.room.Room
 
-import com.example.homework71.data.local.NoteDao
-import com.example.homework71.data.local.NoteDatabase
-import com.example.homework71.data.repository.NoteRepositoryImpl
+import com.example.homework71.datamain.local.NoteDao
+import com.example.homework71.datamain.local.NoteDatabase
+import com.example.homework71.datamain.repository.NoteRepositoryImpl
 import com.example.homework71.domain.repository.NoteRepository
 import dagger.Module
 import dagger.Provides
@@ -23,21 +23,21 @@ object NoteModule {
     @Provides
     fun provideNoteDatabase(
         @ApplicationContext context: Context
-    ): NoteDatabase = Room.databaseBuilder(
+    ): com.example.homework71.datamain.local.NoteDatabase = Room.databaseBuilder(
         context,
-        NoteDatabase::class.java,
+        com.example.homework71.datamain.local.NoteDatabase::class.java,
         "note_db"
         ).allowMainThreadQueries().build()
 
     @Singleton
     @Provides
-    fun provideNoteDao(noteDatabase: NoteDatabase) = noteDatabase.noteDao()
+    fun provideNoteDao(noteDatabase: com.example.homework71.datamain.local.NoteDatabase) = noteDatabase.noteDao()
 
 
     @Singleton
     @Provides
     fun provideNoteRepository(
-        noteDao: NoteDao
-    ): NoteRepository = NoteRepositoryImpl(noteDao)
+        noteDao: com.example.homework71.datamain.local.NoteDao
+    ): NoteRepository = com.example.homework71.datamain.repository.NoteRepositoryImpl(noteDao)
 
 }

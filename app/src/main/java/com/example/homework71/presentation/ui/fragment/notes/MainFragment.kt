@@ -22,7 +22,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     private val binding by viewBinding(FragmentMainBinding::bind)
     private val viewModel: MainViewModel by viewModels()
     private lateinit var builder: AlertDialog.Builder
-    private lateinit var adapter: NoteAdapter
+    private lateinit var adapter: NoteListAdapter
+    private var listAdapter= NoteListAdapter(this::onLongNoteClick,this::onNoteClick)
     private var notePosition: Int? = null
 
     companion object {
@@ -31,7 +32,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        adapter = NoteAdapter(this::onLongNoteClick, this::onNoteClick)
         builder = AlertDialog.Builder(requireContext())
     }
 
@@ -57,9 +57,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 binding.progress.isVisible = state is UIState.Loading
             },
             onSuccess = {
-                if (notePosition != null) {
-                    adapter.deleteNote(adapter.sendNote(notePosition!!))
-                }
+                viewModel.getNotes()
             }
         )
         viewModel.getNotesState.collectUIState(
@@ -67,18 +65,16 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 binding.progress.isVisible = state is UIState.Loading
             },
             onSuccess = { data ->
-                adapter.addAllNotes(data)
+                adapter.submitList(data)
             }
         )
-
     }
 
-    private fun onLongNoteClick(position: Int) {
+    private fun onLongNoteClick(note:Note) {
         builder.setTitle("Delete").setMessage("Do you want to delete?")
             .setCancelable(true)
             .setPositiveButton("Yes") { dialogInterface, _ ->
-                viewModel.deleteNote(adapter.sendNote(position))
-                notePosition = position
+                viewModel.deleteNote(note)
                 dialogInterface.dismiss()
             }
             .setNegativeButton("Cancel") { dialogInterface, _ ->

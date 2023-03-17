@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
     private val _updateNoteState = MutableStateFlow<UIState<Unit>>(UIState.Empty())
     val updateNoteState = _updateNoteState.asStateFlow()
 
-    fun editNote(note:Note){
+    fun editNote(note: Note){
         updateNoteUseCase(note).collectFlow(_updateNoteState)
     }
 

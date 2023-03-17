@@ -1,6 +1,6 @@
 object Versions{
     const val AGP ="7.3.1"
-    const val kotlin = "1.7.21"
+    const val kotlin = "1.8.0"
     const val appCompat = "1.6.1"
     const val material = "1.8.0"
     const val constraint = "2.1.4"
